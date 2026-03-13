@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>tobi.ai</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#09090f;--s1:#111118;--s2:#17171f;--s3:#1e1e28;
+  --b1:rgba(255,255,255,0.07);--b2:rgba(255,255,255,0.12);
+  --t1:#eeeef8;--t2:#8888a0;--t3:#4a4a60;
+  --v:#6c5ce7;--v2:#9d8fff;--vd:rgba(108,92,231,0.18);--vd2:rgba(108,92,231,0.3);
+  --am:#f0a050;--amd:rgba(240,160,80,0.14);
+  --rd:#e05555;--rdd:rgba(224,85,85,0.12);
+  --r:10px;--r2:14px;
+  --ff:'DM Sans',sans-serif;--fd:'Syne',sans-serif;
+}
+html,body{background:var(--bg);color:var(--t1);font-family:var(--ff);height:100%;overflow:hidden;font-size:15px;-webkit-font-smoothing:antialiased}
+#app{display:flex;height:100vh}
+#sidebar{width:228px;flex-shrink:0;display:flex;flex-direction:column;background:var(--s1);border-right:1px solid var(--b1)}
+#main{flex:1;overflow:hidden;display:flex;flex-direction:column;min-width:0}
+#mob-nav{display:none}
+@media(max-width:720px){
+  #sidebar{display:none}
+  #mob-nav{display:flex;border-top:1px solid var(--b1);background:var(--s1);flex-shrink:0}
+  #main{height:calc(100vh - 58px)}
+}
+.slogo{padding:18px 20px;border-bottom:1px solid var(--b1)}
+.slogo-t{font-family:var(--fd);font-size:22px;font-weight:800;letter-spacing:-0.5px}
+.slogo-t span{color:var(--v2)}
+.slogo-s{font-size:11px;color:var(--t3);margin-top:1px}
+.snav{padding:6px 0;flex:1}
+.ni{display:flex;align-items:center;gap:11px;padding:9px 18px;cursor:pointer;color:var(--t2);font-size:13.5px;border:none;background:none;width:100%;text-align:left;font-family:var(--ff);transition:all .12s;font-weight:400}
+.ni:hover{color:var(--t1);background:var(--s2)}
+.ni.active{color:var(--v2);background:var(--vd);font-weight:500}
+.ni svg{width:16px;height:16px;flex-shrink:0;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.sfoot{padding:14px 18px;border-top:1px solid var(--b1);font-size:12px;color:var(--t3)}
+.mbb{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 4px 10px;background:none;border:none;color:var(--t3);cursor:pointer;font-family:var(--ff);transition:color .12s}
+.mbb.active{color:var(--v2)}
+.mbb svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.mbb span{font-size:10px}
+.screen{display:none;flex:1;overflow-y:auto}
+.screen.active{display:flex;flex-direction:column}
+#scr-chat{overflow:hidden}
+#ob{position:fixed;inset:0;background:var(--bg);z-index:300;display:flex;align-items:center;justify-content:center;padding:20px;overflow-y:auto}
+#ob.gone{display:none}
+.ob-wrap{max-width:420px;width:100%;padding:8px 0}
+.ob-step{display:none}
+.ob-step.on{display:block}
+.ob-title{font-family:var(--fd);font-size:24px;font-weight:800;margin-bottom:6px;letter-spacing:-0.5px}
+.ob-sub{font-size:14px;color:var(--t2);margin-bottom:22px;line-height:1.5}
+.pg{padding:26px 30px;max-width:760px;flex:1}
+@media(max-width:720px){.pg{padding:18px 14px}}
+.pg-t{font-family:var(--fd);font-size:22px;font-weight:800;margin-bottom:4px;letter-spacing:-0.3px}
+.pg-s{font-size:13px;color:var(--t2);margin-bottom:22px}
+label{font-size:11px;color:var(--t2);margin-bottom:5px;display:block;font-weight:500;letter-spacing:0.05em;text-transform:uppercase}
+input[type=text],input[type=date],select,textarea{background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);color:var(--t1);font-family:var(--ff);font-size:14px;padding:10px 12px;width:100%;outline:none;transition:border-color .12s;-webkit-appearance:none;appearance:none}
+input:focus,select:focus,textarea:focus{border-color:var(--v)}
+input::placeholder,textarea::placeholder{color:var(--t3)}
+select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%234a4a60' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:30px}
+select option{background:#17171f}
+.f{margin-bottom:13px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+input[type=range]{-webkit-appearance:none;appearance:none;background:var(--s3);height:4px;border-radius:99px;width:100%;border:none;padding:0;cursor:pointer}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:17px;height:17px;border-radius:50%;background:var(--v);cursor:pointer}
+input[type=range]::-moz-range-thumb{width:17px;height:17px;border-radius:50%;background:var(--v);cursor:pointer;border:none}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:10px 18px;border-radius:var(--r);border:none;cursor:pointer;font-family:var(--ff);font-size:14px;font-weight:500;transition:all .12s;line-height:1}
+.bp{background:var(--v);color:#fff}
+.bp:hover{background:var(--v2);transform:translateY(-1px)}
+.bp:disabled{opacity:.45;cursor:not-allowed;transform:none}
+.bg{background:var(--s2);color:var(--t2);border:1px solid var(--b1)}
+.bg:hover{color:var(--t1);background:var(--s3)}
+.bfw{width:100%}
+.bsm{padding:7px 13px;font-size:13px}
+.card{background:var(--s1);border:1px solid var(--b1);border-radius:var(--r2);padding:16px}
+.chip{display:inline-flex;align-items:center;padding:2px 9px;border-radius:99px;font-size:11.5px;font-weight:500}
+.chv{background:var(--vd);color:var(--v2)}
+.sp{display:flex;align-items:center;justify-content:space-between;padding:9px 13px;background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);margin-bottom:7px}
+.sdot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.rm{background:none;border:none;color:var(--t3);cursor:pointer;font-size:17px;line-height:1;padding:0 3px}
+.rm:hover{color:var(--rd)}
+.sg{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:20px}
+.sc{background:var(--s1);border:1px solid var(--b1);border-radius:var(--r2);padding:14px 16px}
+.sn{font-family:var(--fd);font-size:28px;font-weight:800;margin:5px 0 2px}
+.sl{font-size:11px;color:var(--t2);text-transform:uppercase;letter-spacing:.05em}
+.ecd{padding:13px 16px;background:var(--vd);border:1px solid var(--vd2);border-radius:var(--r2);margin-bottom:9px;display:flex;align-items:center;justify-content:space-between}
+.ecdn{font-family:var(--fd);font-size:26px;font-weight:800}
+.pd{margin-bottom:22px}
+.pdh{font-size:11px;color:var(--t3);text-transform:uppercase;letter-spacing:.1em;font-weight:500;margin-bottom:9px;display:flex;align-items:center;gap:7px}
+.pdh::before{content:'';display:block;width:5px;height:5px;border-radius:50%;background:var(--v)}
+.ps{display:flex;align-items:flex-start;gap:11px;padding:11px 13px;background:var(--s1);border:1px solid var(--b1);border-radius:var(--r);margin-bottom:6px;border-left-width:3px}
+.pt{font-size:12px;color:var(--t3);min-width:40px;padding-top:2px;font-variant-numeric:tabular-nums}
+.pi{flex:1}
+.psj{font-size:14px;font-weight:500}
+.ptp{font-size:13px;color:var(--t2);margin-top:2px}
+.pty{display:inline-block;font-size:11px;padding:2px 8px;border-radius:99px;margin-top:5px}
+.pdur{font-size:12px;color:var(--t3);white-space:nowrap;padding-top:2px}
+#chat-msgs{flex:1;overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.msg{display:flex;gap:9px}
+.msg.user{justify-content:flex-end}
+.mb{padding:10px 14px;border-radius:var(--r2);font-size:14px;line-height:1.65;max-width:82%}
+.msg.assistant .mb{background:var(--s2);border:1px solid var(--b1);border-radius:4px var(--r2) var(--r2) var(--r2)}
+.msg.user .mb{background:var(--v);color:#fff;border-radius:var(--r2) 4px var(--r2) var(--r2)}
+.cbar{padding:11px 14px;border-top:1px solid var(--b1);display:flex;gap:8px;background:var(--s1);flex-shrink:0}
+.cbar textarea{flex:1;resize:none;min-height:40px;max-height:96px;padding:9px 12px;font-size:14px}
+.dots span{display:inline-block;width:5px;height:5px;background:var(--t3);border-radius:50%;margin:0 2px;animation:bn 1.2s infinite}
+.dots span:nth-child(2){animation-delay:.2s}
+.dots span:nth-child(3){animation-delay:.4s}
+@keyframes bn{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-5px)}}
+.spin{width:18px;height:18px;border:2px solid rgba(255,255,255,.2);border-top-color:#fff;border-radius:50%;animation:sp .7s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+.err{background:var(--rdd);border:1px solid rgba(224,85,85,.3);border-radius:var(--r);padding:9px 13px;font-size:13px;color:var(--rd);margin-top:10px}
+.sh{font-family:var(--fd);font-size:14px;font-weight:700;margin-bottom:11px}
+.abanner{background:var(--amd);border:1px solid rgba(240,160,80,.25);border-radius:var(--r);padding:11px 14px;margin-bottom:16px;font-size:13px;display:flex;gap:10px;align-items:flex-start}
+</style>
+</head>
+<body>
+
+<div id="ob">
+ <div class="ob-wrap">
+
+  <div class="ob-step on" id="s0">
+    <div style="font-family:var(--fd);font-size:40px;font-weight:800;letter-spacing:-1px;margin-bottom:8px">tobi<span style="color:var(--v2)">.ai</span></div>
+    <div class="ob-sub">AI-powered revision planner for A-level students.</div>
+    <div class="abanner">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--am)" stroke-width="2" stroke-linecap="round" style="flex-shrink:0;margin-top:1px"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><circle cx="12" cy="16" r="1" fill="var(--am)" stroke="none"/></svg>
+      <div>
+        <strong style="color:var(--am)">Free Groq API key required.</strong>
+        <div style="color:var(--t2);margin-top:3px">Get a free key at <a href="https://console.groq.com" target="_blank" style="color:var(--v2);text-decoration:none">console.groq.com</a> → API Keys → Create. No payment needed. Stays in your browser only.</div>
+      </div>
+    </div>
+    <div class="f"><label>Groq API key</label><input type="text" id="api-key" placeholder="gsk_..." autocomplete="off"/></div>
+    <div class="g2" style="margin-bottom:13px">
+      <div class="f" style="margin:0"><label>Your name</label><input type="text" id="ob-name" placeholder="e.g. Josiah"/></div>
+      <div class="f" style="margin:0"><label>Year group</label>
+        <select id="ob-year"><option value="">Select</option><option>Year 10</option><option>Year 11</option><option>Year 12</option><option>Year 13</option></select>
+      </div>
+    </div>
+    <button class="btn bp bfw" onclick="s0go()">Continue →</button>
+    <div id="e0" class="err" style="display:none"></div>
+  </div>
+
+  <div class="ob-step" id="s1">
+    <div class="ob-title">Your subjects</div>
+    <div class="ob-sub">Add each subject with exam date and weak topics.</div>
+    <div id="sl" style="margin-bottom:8px"></div>
+    <div class="card" style="margin-bottom:14px">
+      <div class="g2" style="margin-bottom:10px">
+        <div class="f" style="margin:0"><label>Subject</label>
+          <select id="ns-n"><option value="">Select</option><option>Mathematics</option><option>Further Mathematics</option><option>Physics</option><option>Computer Science</option><option>Chemistry</option><option>Biology</option><option>English Literature</option><option>History</option><option>Geography</option><option>Economics</option></select>
+        </div>
+        <div class="f" style="margin:0"><label>Target grade</label>
+          <select id="ns-g"><option value="">Select</option><option>A*</option><option>A</option><option>B</option><option>C</option></select>
+        </div>
+      </div>
+      <div class="f"><label>Exam date</label><input type="date" id="ns-d"/></div>
+      <div class="f" style="margin-bottom:10px">
+        <label>Weak topics <span style="font-style:italic;text-transform:none;letter-spacing:0;font-weight:400;color:var(--t3)">(comma separated)</span></label>
+        <input type="text" id="ns-w" placeholder="e.g. restitution, Poisson distribution"/>
+      </div>
+      <button class="btn bg bfw bsm" onclick="addS()">+ Add subject</button>
+    </div>
+    <button class="btn bp bfw" onclick="s1go()">Continue →</button>
+    <div id="e1" class="err" style="display:none"></div>
+  </div>
+
+  <div class="ob-step" id="s2">
+    <div class="ob-title">Your availability</div>
+    <div class="ob-sub">When can you study? This shapes your whole plan.</div>
+    <div class="card" style="margin-bottom:10px">
+      <div style="font-size:13px;font-weight:500;color:var(--t2);margin-bottom:12px">Weekday evenings</div>
+      <div class="g2">
+        <div class="f" style="margin:0"><label>From</label>
+          <select id="av-f"><option value="15:00">3:00 pm</option><option value="15:30">3:30 pm</option><option value="16:00" selected>4:00 pm</option><option value="16:30">4:30 pm</option><option value="17:00">5:00 pm</option><option value="18:00">6:00 pm</option></select>
+        </div>
+        <div class="f" style="margin:0"><label>Until</label>
+          <select id="av-t"><option value="18:00">6:00 pm</option><option value="19:00">7:00 pm</option><option value="20:00" selected>8:00 pm</option><option value="21:00">9:00 pm</option><option value="21:30">9:30 pm</option></select>
+        </div>
+      </div>
+    </div>
+    <div class="card" style="margin-bottom:20px">
+      <div style="font-size:13px;font-weight:500;color:var(--t2);margin-bottom:14px">Weekend hours</div>
+      <div style="margin-bottom:14px">
+        <div style="display:flex;justify-content:space-between;margin-bottom:8px"><label style="margin:0">Saturday</label><span id="sv" style="font-size:13px;color:var(--v2);font-weight:500">4h</span></div>
+        <input type="range" min="1" max="10" value="4" id="av-sa" oninput="document.getElementById('sv').textContent=this.value+'h'">
+      </div>
+      <div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:8px"><label style="margin:0">Sunday</label><span id="suv" style="font-size:13px;color:var(--v2);font-weight:500">3h</span></div>
+        <input type="range" min="1" max="10" value="3" id="av-su" oninput="document.getElementById('suv').textContent=this.value+'h'">
+      </div>
+    </div>
+    <button class="btn bp bfw" id="gbtn" onclick="genPlan()">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+      Generate my plan
+    </button>
+    <div id="e2" class="err" style="display:none"></div>
+  </div>
+
+ </div>
+</div>
+
+<div id="app" style="display:none">
+  <div id="sidebar">
+    <div class="slogo">
+      <div class="slogo-t">tobi<span>.ai</span></div>
+      <div class="slogo-s">revision planner</div>
+    </div>
+    <nav class="snav">
+      <button class="ni active" data-s="dashboard" onclick="go('dashboard')">
+        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Dashboard
+      </button>
+      <button class="ni" data-s="plan" onclick="go('plan')">
+        <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>My Plan
+      </button>
+      <button class="ni" data-s="subjects" onclick="go('subjects')">
+        <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>Subjects
+      </button>
+      <button class="ni" data-s="chat" onclick="go('chat')">
+        <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>Chat with Tobi
+      </button>
+    </nav>
+    <div class="sfoot" id="sf"></div>
+  </div>
+
+  <div id="main">
+    <div class="screen active" id="scr-dashboard">
+      <div class="pg">
+        <div style="margin-bottom:22px">
+          <div id="dg" style="font-family:var(--fd);font-size:21px;font-weight:800;letter-spacing:-.3px"></div>
+          <div id="dd" style="font-size:13px;color:var(--t2);margin-top:3px"></div>
+        </div>
+        <div id="dcd"></div>
+        <div class="sg">
+          <div class="sc"><div class="sl">Subjects</div><div id="dns" class="sn">—</div></div>
+          <div class="sc"><div class="sl">Hours/week</div><div id="dhw" class="sn">—</div></div>
+        </div>
+        <div class="sh">Today's sessions</div>
+        <div id="dt"></div>
+        <div style="margin-top:22px" class="sh">Subjects</div>
+        <div id="dsj"></div>
+      </div>
+    </div>
+
+    <div class="screen" id="scr-plan">
+      <div class="pg">
+        <div class="pg-t">My revision plan</div>
+        <div class="pg-s" id="psub">Complete setup to generate your plan.</div>
+        <div id="pb"></div>
+      </div>
+    </div>
+
+    <div class="screen" id="scr-subjects">
+      <div class="pg">
+        <div class="pg-t">Subjects</div>
+        <div class="pg-s">Your subjects and revision focus areas</div>
+        <div id="sjd"></div>
+      </div>
+    </div>
+
+    <div class="screen" id="scr-chat" style="flex-direction:column">
+      <div style="padding:13px 18px;border-bottom:1px solid var(--b1);flex-shrink:0;background:var(--s1)">
+        <div style="font-size:15px;font-weight:500">Tobi</div>
+        <div style="font-size:12px;color:var(--t2)">AI revision assistant · knows your subjects &amp; plan</div>
+      </div>
+      <div id="chat-msgs"></div>
+      <div class="cbar">
+        <textarea id="cin" placeholder="Ask Tobi anything…" onkeydown="ck(event)" rows="1"></textarea>
+        <button class="btn bp" id="sbtn" onclick="sendMsg()" style="height:40px;padding:0 14px;flex-shrink:0">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div id="mob-nav">
+    <button class="mbb active" data-s="dashboard" onclick="go('dashboard')"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span>Home</span></button>
+    <button class="mbb" data-s="plan" onclick="go('plan')"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span>Plan</span></button>
+    <button class="mbb" data-s="subjects" onclick="go('subjects')"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg><span>Subjects</span></button>
+    <button class="mbb" data-s="chat" onclick="go('chat')"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg><span>Tobi</span></button>
+  </div>
+</div>
+
+<script>
+const CLR={'Mathematics':'#3ec97a','Further Mathematics':'#f0a050','Physics':'#5a9ef0','Computer Science':'#6c5ce7','Chemistry':'#e05555','Biology':'#3ec97a','English Literature':'#c084fc','History':'#a78bfa','Geography':'#34d399','Economics':'#fb923c'};
+const gc=n=>CLR[n]||'#6c5ce7';
+let D={profile:null,subjects:[],plan:null,history:[],key:''};
+const fmt=d=>{if(!d)return'';return new Date(d+'T00:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})};
+const dTo=d=>{if(!d)return null;return Math.ceil((new Date(d+'T00:00:00')-new Date())/864e5)};
+const greet=()=>{const h=new Date().getHours();return h<12?'Good morning':h<17?'Good afternoon':'Good evening'};
+const $=id=>document.getElementById(id);
+
+function go(s){
+  document.querySelectorAll('.screen').forEach(e=>e.classList.remove('active'));
+  $('scr-'+s).classList.add('active');
+  document.querySelectorAll('.ni,.mbb').forEach(b=>b.classList.toggle('active',b.dataset.s===s));
+  if(s==='dashboard')rDash();
+  if(s==='plan')rPlan();
+  if(s==='subjects')rSubs();
+  if(s==='chat'&&D.history.length===0)initChat();
+}
+
+function s0go(){
+  const k=$('api-key').value.trim(),n=$('ob-name').value.trim(),y=$('ob-year').value,e=$('e0');
+  if(!k){e.textContent='Paste your Groq API key.';e.style.display='block';return}
+  if(!n||!y){e.textContent='Enter your name and year group.';e.style.display='block';return}
+  e.style.display='none';D.key=k;D.profile={name:n,year:y};
+  $('s0').classList.remove('on');$('s1').classList.add('on');
+}
+
+function addS(){
+  const n=$('ns-n').value,g=$('ns-g').value,d=$('ns-d').value,w=$('ns-w').value.trim();
+  if(!n)return;
+  D.subjects.push({id:Date.now(),name:n,grade:g,exam:d,weak:w});
+  $('ns-n').value='';$('ns-g').value='';$('ns-d').value='';$('ns-w').value='';rSL();
+}
+function remS(id){D.subjects=D.subjects.filter(s=>s.id!==id);rSL()}
+function rSL(){
+  $('sl').innerHTML=D.subjects.map(s=>`<div class="sp"><div style="display:flex;align-items:center;gap:8px"><div class="sdot" style="background:${gc(s.name)}"></div><span style="font-size:14px;font-weight:500">${s.name}</span>${s.grade?`<span class="chip chv" style="font-size:11px">${s.grade}</span>`:''}</div><button class="rm" onclick="remS(${s.id})">×</button></div>`).join('');
+}
+function s1go(){
+  const e=$('e1');
+  if(!D.subjects.length){e.textContent='Add at least one subject.';e.style.display='block';return}
+  e.style.display='none';$('s1').classList.remove('on');$('s2').classList.add('on');
+}
+
+async function genPlan(){
+  const e=$('e2'),btn=$('gbtn');
+  e.style.display='none';btn.disabled=true;btn.innerHTML='<div class="spin"></div> Generating…';
+  D.profile.af=$('av-f').value;D.profile.at=$('av-t').value;D.profile.sa=$('av-sa').value;D.profile.su=$('av-su').value;
+  const today=new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  const prompt=`You are Tobi, an AI revision planner for UK A-level students. Create a 7-day revision plan starting today (${today}).
+
+Student: ${D.profile.name}, ${D.profile.year}
+Subjects:
+${D.subjects.map(s=>`- ${s.name}: target ${s.grade||'best possible'}, exam ${s.exam?fmt(s.exam):'TBD'}, weak topics: ${s.weak||'not specified'}`).join('\n')}
+Weekday availability: ${D.profile.af}–${D.profile.at}
+Weekend: Saturday ${D.profile.sa}h, Sunday ${D.profile.su}h
+
+Rules:
+- Prioritise subjects with closer exams and named weak topics
+- Sessions 30–90 min, no more than 3 sessions per day
+- Session types: practice questions, topic review, past paper, flashcards, worked examples
+- Reference weak topics specifically in the topic field
+- Balance subjects across the week
+
+Respond ONLY with valid JSON, no markdown fences, no explanation:
+{"summary":"one sentence strategy","plan":[{"day":"Monday","date":"13 Mar","sessions":[{"subject":"Further Mathematics","topic":"Coefficient of restitution — worked examples","type":"worked examples","start":"16:00","end":"17:15","duration":75}]}]}`;
+
+  try{
+    const r=await groq([{role:'user',content:prompt}],2048);
+    const parsed=JSON.parse(r.replace(/```json|```/g,'').trim());
+    D.plan=parsed;
+    $('ob').classList.add('gone');$('app').style.display='flex';$('sf').textContent=D.profile.name+' · '+D.profile.year;
+    rDash();rPlan();rSubs();
+    addMsg('assistant',`Hi ${D.profile.name}! Your 7-day plan is ready. ${parsed.summary} Check "My Plan" for the full schedule, or ask me anything.`);
+  }catch(err){
+    e.textContent='Error: '+(err.message||'Could not generate plan. Check your API key.');
+    e.style.display='block';btn.disabled=false;
+    btn.innerHTML='<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Generate my plan';
+  }
+}
+
+async function groq(messages, maxTokens=600){
+  const res=await fetch('https://api.groq.com/openai/v1/chat/completions',{
+    method:'POST',
+    headers:{'Content-Type':'application/json','Authorization':'Bearer '+D.key},
+    body:JSON.stringify({model:'llama-3.3-70b-versatile',messages,max_tokens:maxTokens,temperature:0.7})
+  });
+  const data=await res.json();
+  if(data.error)throw new Error(data.error.message);
+  return data.choices[0].message.content;
+}
+
+function rDash(){
+  if(!D.profile)return;
+  $('dg').textContent=greet()+', '+D.profile.name;
+  $('dd').textContent=new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'});
+  const wh=(parseInt(D.profile.at||'20')-parseInt(D.profile.af||'16'))*5;
+  $('dhw').textContent=wh+parseInt(D.profile.sa||4)+parseInt(D.profile.su||3);
+  $('dns').textContent=D.subjects.length;
+  const up=D.subjects.filter(s=>s.exam&&dTo(s.exam)>0).sort((a,b)=>dTo(a.exam)-dTo(b.exam)).slice(0,2);
+  $('dcd').innerHTML=up.map(s=>`<div class="ecd"><div><div style="font-size:14px;font-weight:500">${s.name}</div><div style="font-size:12px;color:var(--t3)">${fmt(s.exam)}</div></div><div style="text-align:right"><div class="ecdn" style="color:${dTo(s.exam)<30?'var(--am)':'var(--v2)'}">${dTo(s.exam)}</div><div style="font-size:11px;color:var(--t3)">days</div></div></div>`).join('');
+  const te=$('dt');
+  if(D.plan){
+    const td=new Date().toLocaleDateString('en-GB',{weekday:'long'});
+    const found=D.plan.plan.find(d=>d.day===td);
+    if(found&&found.sessions.length){
+      te.innerHTML=found.sessions.map(s=>`<div class="ps" style="border-left-color:${gc(s.subject)}"><div class="pt">${s.start}</div><div class="pi"><div class="psj" style="color:${gc(s.subject)}">${s.subject}</div><div class="ptp">${s.topic}</div></div><div class="pdur">${s.duration}m</div></div>`).join('');
+    }else te.innerHTML='<div style="color:var(--t3);font-size:14px;padding:10px 0">Rest day — no sessions scheduled.</div>';
+  }else te.innerHTML='<div style="color:var(--t3);font-size:14px;padding:10px 0">Generate your plan to see today\'s sessions.</div>';
+  $('dsj').innerHTML=D.subjects.map(s=>`<div class="card" style="display:flex;align-items:center;gap:11px;margin-bottom:8px;padding:11px 13px"><div style="width:8px;height:8px;border-radius:50%;background:${gc(s.name)};flex-shrink:0"></div><div style="flex:1"><div style="font-size:14px;font-weight:500">${s.name}</div><div style="font-size:12px;color:var(--t3)">${s.exam?dTo(s.exam)+' days until exam':'No exam date'}</div></div>${s.grade?`<span class="chip chv">${s.grade}</span>`:''}</div>`).join('');
+}
+
+function rPlan(){
+  if(!D.plan){$('pb').innerHTML='<div style="color:var(--t3);font-size:14px;padding:16px 0">Complete setup to generate your plan.</div>';return}
+  $('psub').textContent=D.plan.summary;
+  $('pb').innerHTML=D.plan.plan.map(day=>`<div class="pd"><div class="pdh">${day.day} · ${day.date}</div>${day.sessions.length?day.sessions.map(s=>`<div class="ps" style="border-left-color:${gc(s.subject)}"><div class="pt">${s.start}</div><div class="pi"><div class="psj" style="color:${gc(s.subject)}">${s.subject}</div><div class="ptp">${s.topic}</div><span class="pty" style="background:${gc(s.subject)}22;color:${gc(s.subject)}">${s.type}</span></div><div class="pdur">${s.duration}m</div></div>`).join(''):'<div style="font-size:13px;color:var(--t3);padding:4px 0 10px">Rest day</div>'}</div>`).join('');
+}
+
+function rSubs(){
+  $('sjd').innerHTML=D.subjects.map(s=>`<div class="card" style="margin-bottom:11px"><div style="display:flex;align-items:center;gap:11px${s.weak?';margin-bottom:11px':''}"><div style="width:10px;height:10px;border-radius:50%;background:${gc(s.name)};flex-shrink:0"></div><div style="flex:1"><div style="font-size:15px;font-weight:500">${s.name}</div>${s.exam?`<div style="font-size:12px;color:var(--t3)">${fmt(s.exam)} · ${dTo(s.exam)} days</div>`:'<div style="font-size:12px;color:var(--t3)">No exam date set</div>'}</div>${s.grade?`<span class="chip chv">${s.grade}</span>`:''}</div>${s.weak?`<div style="font-size:13px;color:var(--t2);padding-top:10px;border-top:1px solid var(--b1)"><span style="color:var(--t3)">Weak topics: </span>${s.weak}</div>`:''}</div>`).join('')||'<div style="color:var(--t3);font-size:14px">No subjects added.</div>';
+}
+
+function initChat(){
+  addMsg('assistant',`Hi${D.profile?' '+D.profile.name:''}! I'm Tobi, your AI revision assistant.${D.plan?' Your 7-day plan is ready — I know your subjects, weak topics, and schedule. Ask me to explain something, quiz you, or help you prioritise.':' Set up your profile first to generate a plan.'} What do you need?`);
+}
+
+function addMsg(role,text){
+  D.history.push({role,content:text});
+  const el=$('chat-msgs'),d=document.createElement('div');
+  d.className='msg '+role;
+  d.innerHTML=`<div class="mb">${text.replace(/\n/g,'<br>')}</div>`;
+  el.appendChild(d);el.scrollTop=el.scrollHeight;
+}
+function addTyping(){
+  const el=$('chat-msgs'),d=document.createElement('div');
+  d.className='msg assistant';d.id='typing';
+  d.innerHTML='<div class="mb"><div class="dots"><span></span><span></span><span></span></div></div>';
+  el.appendChild(d);el.scrollTop=el.scrollHeight;
+}
+function ck(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMsg()}}
+
+async function sendMsg(){
+  const inp=$('cin'),msg=inp.value.trim();if(!msg)return;
+  inp.value='';$('sbtn').disabled=true;
+  addMsg('user',msg);addTyping();
+  const sys=`You are Tobi, a focused AI revision assistant for UK A-level students. Be concise and practical — max 3 short paragraphs. Direct, not preachy.
+Student: ${D.profile?D.profile.name+', '+D.profile.year:'A-level student'}
+Subjects: ${D.subjects.map(s=>`${s.name} (${s.grade||'no target'}, exam: ${s.exam?fmt(s.exam):'TBD'}, weak: ${s.weak||'—'})`).join(' | ')}
+${D.plan?'Plan summary: '+D.plan.summary:'No plan yet.'}`;
+
+  const messages=[{role:'system',content:sys},...D.history.slice(-8).map(m=>({role:m.role==='assistant'?'assistant':'user',content:m.content}))];
+  try{
+    const r=await groq(messages,600);
+    $('typing')?.remove();addMsg('assistant',r);
+  }catch(err){
+    $('typing')?.remove();
+    addMsg('assistant','Something went wrong — check your API key is valid.');
+  }
+  $('sbtn').disabled=false;
+}
+</script>
+</body>
+</html>
